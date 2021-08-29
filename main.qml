@@ -16,11 +16,11 @@ ApplicationWindow {
 
     title: "Quick Timer"
 
-    property var mainBackGroundColor: "#1F1F1F"
     property var secondaryBackGroundColor: "#2B2B2B"
+    property var mainBackGroundColor: "#1F1F1F"
+    property var altAccentColor: "#494949"
     property var foreGroundColor: "White"
     property var accentColor: "Gray"
-    property var altAccentColor: "#494949"
 
     property var iconFile: "../icons"
 
@@ -54,8 +54,7 @@ ApplicationWindow {
 
                 font.pixelSize: 20
 
-                horizontalAlignment: TextInput.AlignHCenter
- 
+                horizontalAlignment: TextInput.AlignHCenter 
                 maximumLength: parent.width
 
                 //Cant center so I had to do this:
