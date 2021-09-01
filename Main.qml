@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt.labs.settings
 
 ApplicationWindow {
     id: appWindow
@@ -9,7 +10,7 @@ ApplicationWindow {
     Globals {id: globals}
 
     visible: true
-    width: 700
+    width: 1400
     height: 450
 
     title: "Quick Timer"
@@ -19,6 +20,20 @@ ApplicationWindow {
     signal editButtonToggleSignal()
 
     //flags: Qt.FramelessWindowHint
+
+    onClosing: {
+        console.log("Closing")
+    }
+
+    Settings {
+        fileName: "./settings/settings.ini"
+
+        category: "MainWindow"
+        property alias x: appWindow.x
+        property alias y: appWindow.y
+        property alias width: appWindow.width
+        property alias height: appWindow.height
+    }
 
     RowLayout {
         id: mainLayout
@@ -32,6 +47,11 @@ ApplicationWindow {
 
         anchors.fill: parent
         anchors.bottom: menu.top
+
+        ListModel {
+            id: timerList
+        }
+
     }
 
     Rectangle {
