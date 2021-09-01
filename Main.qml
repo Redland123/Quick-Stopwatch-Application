@@ -16,6 +16,8 @@ ApplicationWindow {
 
     color: colors.mainBackGroundColor
 
+    signal editButtonToggleSignal()
+
     //flags: Qt.FramelessWindowHint
 
     RowLayout {
@@ -26,8 +28,10 @@ ApplicationWindow {
 
         anchors.leftMargin: 10
         anchors.rightMargin: 10
+        anchors.bottomMargin: 50
 
         anchors.fill: parent
+        anchors.bottom: menu.top
     }
 
     Rectangle {
@@ -46,12 +50,18 @@ ApplicationWindow {
         height: 40
 
         RoundButton {
+            id: editButton
+            property var oldWidth: 40
+
             height: parent.height
+
             width: 40
 
             anchors.left: parent.left
+            //anchors.rightMargin: 20
 
             Text {
+                id: textField
                 text: "Edit"
                 color: colors.foreGroundColor
 
@@ -61,22 +71,40 @@ ApplicationWindow {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
+            onClicked: {
+                appWindow.editButtonToggleSignal()
+
+                if (textField.text == "Edit"){
+                    textField.text = "Done"
+                    newTimerButton.visible = false
+                    anchors.left = undefined
+                    anchors.right = parent.right
+                }
+                else {
+                    textField.text = "Edit"
+                    anchors.left = parent.left
+                    anchors.right = undefined
+                    width = oldWidth
+                    newTimerButton.visible = true
+                }
+            }
+
             background: Rectangle {
                     color: {
-                        if (parent.down) {
+                        if (parent.down)
                             colors.foreGroundColor
-                        } else if (parent.hovered) {
+                        else if (parent.hovered)
                             colors.accentColor
-                        } else {
+                        else
                             colors.altAccentColor
-                        }
                     }
-
                     radius: 5
             }
         }
 
         RoundButton {
+            id: newTimerButton
+
             height: parent.height
             width: 125
 
@@ -94,6 +122,17 @@ ApplicationWindow {
 
             onClicked: {
                 var newTimer = Qt.createComponent("Timer.qml").createObject(mainLayout);
+
+                if (newTimer == null){
+                    console.error("Error in Timer.qml")
+                    return
+                }
+
+                appWindow.editButtonToggleSignal.connect(newTimer.toggleEditButton)
+                
+                newTimer.beingDeleted.connect(function(){
+                    appWindow.editButtonToggleSignal.disconnect(newTimer.toggleEditButton)
+                })
             }
 
             background: Rectangle {
