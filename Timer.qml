@@ -6,7 +6,9 @@ Rectangle {
     id: timerBody
 
     signal beingDeleted()
+
     Component.onDestruction: beingDeleted()
+    Component.onCompleted: Layout.alignment = Qt.AlignHCenter
 
     property var source: parent
 
