@@ -5,27 +5,41 @@ import QtQuick.Layouts
 Rectangle {
     id: timerBody
 
-    signal beingDeleted()
+    width: 300
+    height: 350
+    radius: width*0.1
 
-    //Component.onDestruction: beingDeleted()
+    //Signals
+    signal beingDeleted()
+ 
+    Style {id: colors}
+    Globals {id: globals}
+
+    property var editButtonStatus: false
+
+    property var seconds: 0
+    property var minutes: 0
+    property var hours: 0
+
+    color: colors.secondaryBackGroundColor 
+
+    //Runs when timer is created
     Component.onCompleted: Layout.alignment = Qt.AlignHCenter
 
+    //Getters
     function getTimerName(){
-        if (timerTextField)
-            return timerTextField.text
-        else 
-            return "null"
+        if (timerName) return timerName.text
+        else return "null"
     }
 
     function getTimerValue(){
         return timerDisplayText.text
     }
 
+    //Setters
     function setTimerName(newName){
-        if (newName)
-            timerTextField.text = newName
-        else
-            timerTextField.text = ""
+        if (newName) timerName.text = newName
+        else timerName.text = ""
     }
 
     function setTimerValue(newValue){
@@ -35,75 +49,53 @@ Rectangle {
             var x = newValue.split(":")
 
             hours = Number(x[0])
-            minuntes = Number(x[1])
+            minutes = Number(x[1])
             seconds = Number(x[2])
         }
-        else {
-            timerTextField.text = "Error"
-        }
+        else timerName.text = "00:00:00"
     }
 
-    property var iconFile: "../icons"
-    property var editButtonStatus: false
-
-    property var seconds: 0
-    property var minuntes: 0
-    property var hours: 0
-
-    Style {id: colors}
-    Globals {id: globals}
-
-    width: 300
-    height: 350
-    radius: width*0.1
-
-    color: colors.secondaryBackGroundColor 
-
+    //Toggles
     function toggleEditButton() {
-        if (editButtonStatus)
-            editButtonStatus = false
-        else 
-            editButtonStatus = true
+        if (editButtonStatus) editButtonStatus = false
+        else editButtonStatus = true
     }
 
     Timer {
-        id: timer
+        id: mainTimer
+
         interval: 1000
         running: false
         repeat: true
+
         onTriggered: {
-
             seconds++
-            
-            if (Math.floor(seconds / 60)){
-                seconds -= 60
-                minuntes++
-            }
-
-            if (Math.floor(minuntes / 60)){
-                minuntes -= 60
-                hours++
-            }
 
             var newDisplayTime = ""
 
+            if (Math.floor(seconds / 60)){
+                seconds -= 60
+                minutes++
+            }
+
+            if (Math.floor(minutes / 60)){
+                minutes -= 60
+                hours++
+            }
+
             getString(hours.toString(), ":")
-            getString(minuntes.toString(), ":")
+            getString(minutes.toString(), ":")
             getString(seconds.toString(), "")
+
+            timerDisplayText.text = newDisplayTime
 
             function getString(currentValue, suffix){
                 var i = currentValue
                 var x = suffix
 
-                if (i.length == 1){
-                    newDisplayTime += "0" + i + x
-                }
-                else {
-                    newDisplayTime += i + x
-                }
+                if (i.length == 1) newDisplayTime += "0" + i + x
+                else newDisplayTime += i + x
             }
-
-            timerDisplayText.text = newDisplayTime
         }
     }    
 
@@ -127,52 +119,42 @@ Rectangle {
         }
 
         background: Rectangle {
-                color: {
-                    if (parent.down) {
-                        colors.altAccentColor
-                    } else if (parent.hovered) {
-                        "Maroon"
-                    } else {
-                        "Red"
-                    }
-                }
-                radius: deleteButton.radius
-        }
+            radius: deleteButton.radius
 
+            color: {
+                if (parent.down) colors.altAccentColor
+                else if (parent.hovered) "Maroon"
+                else "Red"
+            }
+        }
     }
 
     TextField {
-        id: timerTextField
+        id: timerName
+
+        font.pixelSize: 20
+        placeholderText: "  Timer Name"
+        color: colors.foreGroundColor
+
         anchors.topMargin: 5
 
         anchors.horizontalCenter: timerBody.horizontalCenter
         anchors.top: timerBody.top
 
-        font.pixelSize: 20
-
         horizontalAlignment: TextInput.AlignHCenter 
         maximumLength: parent.width
 
-        //Cant center so I had to do this:
-        placeholderText: "  Timer Name"
-
-        color: colors.foreGroundColor
-
         background: Rectangle { 
+            height: 2
+
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 7
 
             color: {
-                if (parent.hovered){
-                    colors.accentColor
-                } else {
-                    colors.altAccentColor
-                }
+                if (parent.hovered) colors.accentColor
+                else colors.altAccentColor
             }
-
-            height: 2
-
-            }
+        }
     }
 
     Rectangle {
@@ -197,42 +179,26 @@ Rectangle {
 
         Text {
             id: copyNotification
-            text: "Time Coppied"
-
-            color: colors.foreGroundColor
-
             visible: false
 
-            Timer {
-                id: copyNotificationTimer
-                interval: 500
-
-                running: false
-                repeat: false
-
-                onTriggered: {
-                    parent.visible = false
-
-                    //parent.opacity = parent.opacity - 0.02 / parent.opacity
-                    //console.log(parent.opacity)
-
-                    /*
-                    if (parent.opacity <= 0){
-                        parent.visible = false
-                        parent.opacity = 1
-                        stop() 
-                    }
-                    */
-                }
-            }
-
+            text: "Time Coppied"
+            color: colors.foreGroundColor
             font.pixelSize: 15
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: timerDisplayText.top
             anchors.bottomMargin: 10
-        }
 
+            Timer {
+                id: copyNotificationTimer
+
+                interval: 500
+                running: false
+                repeat: false
+
+                onTriggered: parent.visible = false
+            }
+        }
 
         Text {
             id: timerDisplayText
@@ -241,15 +207,13 @@ Rectangle {
             visible: true
             font.pixelSize: 35
 
-            color: {
-                if (textMouseArea.containsMouse)
-                    colors.altAccentColor
-                else
-                    colors.foreGroundColor
-            }
-
             anchors.horizontalCenter: circle.horizontalCenter
             anchors.verticalCenter: circle.verticalCenter
+
+            color: {
+                if (textMouseArea.containsMouse) colors.altAccentColor
+                else colors.foreGroundColor
+            }
 
             TextField {
                 id: textFieldCopy
@@ -258,8 +222,9 @@ Rectangle {
 
             MouseArea {
                 id: textMouseArea
-                anchors.fill: parent
                 hoverEnabled: true
+
+                anchors.fill: parent
 
                 onClicked: {
                     textFieldCopy.text = parent.text
@@ -269,11 +234,11 @@ Rectangle {
                     copyNotification.visible = true
                 }
             }
-
         }
     }
 
     Rectangle {
+        //Control button layout
         width: 100
         height: 50
 
@@ -286,94 +251,87 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
 
         RoundButton {
-            id: restButton
-            anchors.right: parent.right
+            id: resetButton
+
             height: parent.height
             width: parent.height
 
+            anchors.right: parent.right
+
             Image {
-                id: icon
+                id: resetIcon
+
                 anchors.centerIn: parent
                 anchors.fill: parent
                 anchors.margins: 7
 
                 source: {
-                    if (seconds || minuntes || hours)
-                        "./icons/reset.png"
-                    else
-                        "./icons/reset50.png"
+                    if (seconds || minutes || hours) "./icons/reset.png"
+                    else "./icons/reset50.png"
                 }
-
             }
 
             onClicked: {
-                timer.stop()
+                mainTimer.stop()
+
                 seconds = 0
-                minuntes = 0
+                minutes = 0
                 hours = 0
 
                 startPauseButton.buttonChecked = false
-
                 timerDisplayText.text = "00:00:00"
             }
 
             background: Rectangle {
-                    color: {
-                        if (parent.down){
-                            colors.accentColor
-                        } else {
-                            colors.altAccentColor
-                        }
-                    }
-
                     radius: parent.width*0.5
-            }
-            
+
+                    color: {
+                        if (parent.hovered && (seconds || minutes || hours)) colors.accentColor
+                        else colors.altAccentColor
+                    }
+            }    
         }
+
         RoundButton {
             id: startPauseButton
 
             property var buttonChecked: false
 
-            anchors.left: parent.left
             height: parent.height
             width: parent.height
+
+            anchors.left: parent.left
 
             Image {
                 id: icon2
                 anchors.centerIn: parent
                 anchors.fill: parent
                 anchors.margins: 7
-                source: {
-                    if (startPauseButton.buttonChecked == true)
-                        "./icons/pause.png" 
-                    else
-                        "./icons/start.png" 
-                }
-            }
 
-            onClicked: {
-                if (buttonChecked == true){
-                    buttonChecked = false
-                    timer.running = false
+                source: {
+                    if (startPauseButton.buttonChecked == true) "./icons/pause.png" 
+                    else "./icons/start.png" 
                 }
-                else {
-                    buttonChecked = true
-                    timer.running = true 
-                }
-            
             }
 
             background: Rectangle {
-                    color: {
-                        if (parent.hovered){
-                            colors.accentColor
-                        } else {
-                            colors.altAccentColor
-                        }
-                    }
-
                     radius: parent.width*0.5
+
+                    color: {
+                        if (parent.hovered) colors.accentColor
+                        else colors.altAccentColor
+                    }
+            }
+
+            onClicked: {
+                if (buttonChecked){
+                    buttonChecked = false
+                    mainTimer.running = false
+                }
+                else {
+                    buttonChecked = true
+                    mainTimer.running = true 
+                }            
             }
         }
     }
