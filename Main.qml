@@ -10,7 +10,7 @@ ApplicationWindow {
     Globals {id: globals}
 
     visible: true
-    width: 1400
+    width: 450
     height: 450
 
     title: "Quick Timer"
@@ -21,11 +21,70 @@ ApplicationWindow {
 
     //flags: Qt.FramelessWindowHint
 
+    Component.onCompleted: {
+        for (let i = 0; i < componentSettings.value("count"); i++)
+           createNewTimer()
+
+        if (timerList.count)
+            loadValues()
+    }
+
+    function loadValues() {
+        var tmp = componentSettings.values.split("#")
+
+        tmp.splice(0,1)
+
+        for (let i = 0; i < tmp.length; i++){
+            var x = tmp[i].split("&")
+
+            console.log(x)
+
+            timerList.get(i).timer.setTimerName(x[0])
+            timerList.get(i).timer.setTimerValue(x[1])
+        }
+    }
+
+    function createNewTimer() {
+        var newTimer = Qt.createComponent("Timer.qml").createObject(mainLayout);
+
+        timerList.append({"timer": newTimer})
+
+        if (newTimer == null){
+            console.error("Error in Timer.qml")
+            return
+        }
+
+        appWindow.editButtonToggleSignal.connect(newTimer.toggleEditButton)
+        
+        newTimer.beingDeleted.connect(function(){
+            appWindow.editButtonToggleSignal.disconnect(newTimer.toggleEditButton)
+
+            //Finds the timer that's being deleted and removes it from the list
+            for (let i = 0; i < timerList.count; i++){
+                if (timerList.get(i).timer == newTimer)
+                    timerList.remove(i)
+            }
+        })
+    }
+
     onClosing: {
         console.log("Closing")
+
+        var newTimerString = ""
+ 
+        for (let i = 0; i < timerList.count; i++){
+            var currentTimer = timerList.get(i).timer
+
+            timerList.timerValues 
+            
+            newTimerString += "#" + currentTimer.getTimerName() + "&" + currentTimer.getTimerValue()
+        }
+
+        timerList.timerValues = newTimerString
     }
 
     Settings {
+        id: windowSettings
         fileName: "./settings/settings.ini"
 
         category: "MainWindow"
@@ -33,6 +92,15 @@ ApplicationWindow {
         property alias y: appWindow.y
         property alias width: appWindow.width
         property alias height: appWindow.height
+    }
+
+    Settings {
+        id: componentSettings
+        fileName: "./settings/settings.ini"
+
+        category: "Components"
+        property alias count: timerList.count
+        property alias values: timerList.timerValues
     }
 
     RowLayout {
@@ -50,6 +118,7 @@ ApplicationWindow {
 
         ListModel {
             id: timerList
+            property var timerValues: ""
         }
 
     }
@@ -141,18 +210,7 @@ ApplicationWindow {
             }
 
             onClicked: {
-                var newTimer = Qt.createComponent("Timer.qml").createObject(mainLayout);
-
-                if (newTimer == null){
-                    console.error("Error in Timer.qml")
-                    return
-                }
-
-                appWindow.editButtonToggleSignal.connect(newTimer.toggleEditButton)
-                
-                newTimer.beingDeleted.connect(function(){
-                    appWindow.editButtonToggleSignal.disconnect(newTimer.toggleEditButton)
-                })
+                createNewTimer()
             }
 
             background: Rectangle {

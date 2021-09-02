@@ -7,10 +7,41 @@ Rectangle {
 
     signal beingDeleted()
 
-    Component.onDestruction: beingDeleted()
+    //Component.onDestruction: beingDeleted()
     Component.onCompleted: Layout.alignment = Qt.AlignHCenter
 
-    property var source: parent
+    function getTimerName(){
+        if (timerTextField)
+            return timerTextField.text
+        else 
+            return "null"
+    }
+
+    function getTimerValue(){
+        return timerDisplayText.text
+    }
+
+    function setTimerName(newName){
+        if (newName)
+            timerTextField.text = newName
+        else
+            timerTextField.text = ""
+    }
+
+    function setTimerValue(newValue){
+        if (newValue){
+            timerDisplayText.text = newValue
+
+            var x = newValue.split(":")
+
+            hours = Number(x[0])
+            minuntes = Number(x[1])
+            seconds = Number(x[2])
+        }
+        else {
+            timerTextField.text = "Error"
+        }
+    }
 
     property var iconFile: "../icons"
     property var editButtonStatus: false
@@ -91,8 +122,8 @@ Rectangle {
         anchors.rightMargin: 20
 
         onClicked: {
-            //TODO: Figure out how to disconnect signal on destruction
             timerBody.destroy()
+            beingDeleted()
         }
 
         background: Rectangle {
