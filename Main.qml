@@ -12,12 +12,106 @@ ApplicationWindow {
     width: 450
     height: 450
 
-    color: colors.mainBackGroundColor
+    color: "transparent" 
+
+    flags: Qt.FramelessWindowHint
 
     Style {id: colors}
     Globals {id: globals}
 
     signal editButtonToggleSignal()
+
+    property var bw: 6
+
+    Rectangle {
+        anchors.margins: 4
+
+        anchors.fill: parent
+        color: colors.tertiaryBackGroundColor
+        radius: 2
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: {
+            const p = Qt.point(mouseX, mouseY);
+            const b = bw + 10; // Increase the corner size slightly
+            if (p.x < b && p.y < b) return Qt.SizeFDiagCursor;
+            if (p.x >= width - b && p.y >= height - b) return Qt.SizeFDiagCursor;
+            if (p.x >= width - b && p.y < b) return Qt.SizeBDiagCursor;
+            if (p.x < b && p.y >= height - b) return Qt.SizeBDiagCursor;
+            if (p.x < b || p.x >= width - b) return Qt.SizeHorCursor;
+            if (p.y < b || p.y >= height - b) return Qt.SizeVerCursor;
+        }
+        acceptedButtons: Qt.NoButton // don't handle actual events
+    }
+
+    DragHandler {
+        id: resizeHandler
+        grabPermissions: TapHandler.TakeOverForbidden
+        target: null
+        onActiveChanged: if (active) {
+            const p = resizeHandler.centroid.position;
+            const b = bw + 10; // Increase the corner size slightly
+            let e = 0;
+            if (p.x < b) { e |= Qt.LeftEdge }
+            if (p.x >= width - b) { e |= Qt.RightEdge }
+            if (p.y < b) { e |= Qt.TopEdge }
+            if (p.y >= height - b) { e |= Qt.BottomEdge }
+            appWindow.startSystemResize(e);
+        }
+    }
+
+
+    Page {
+        header: Loader {source: "Header.qml"}
+
+        anchors.margins: appWindow.visibility === Window.Windowed ? 5 : 0
+        anchors.fill: parent
+
+        clip: true
+
+        background: Rectangle {
+            color: colors.mainBackGroundColor
+        }
+
+        GridLayout {
+            id: mainLayout
+            visible: true
+
+            columnSpacing: 20
+            rowSpacing: 20
+
+            columns: {
+                Math.floor(appWindow.width / 310)
+            }
+
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
+            anchors.bottomMargin: 50
+            anchors.topMargin: 50
+
+            anchors.fill: parent
+
+            ListModel {
+                id: timerList
+                property var timerValues: ""
+            }
+        }
+
+        footer: Loader {source: "Footer.qml"}
+    }
+
+    
+
+    function toggleMaximized() {
+        if (appWindow.visibility === ApplicationWindow.Maximized) {
+            appWindow.showNormal();
+        } else {
+            appWindow.showMaximized();
+        }
+    }
 
     Settings {
         id: windowSettings
@@ -38,130 +132,6 @@ ApplicationWindow {
         property alias count: timerList.count
         property alias values: timerList.timerValues
     }
-
-    GridLayout {
-        id: mainLayout
-        visible: true
-
-        columnSpacing: 20
-        rowSpacing: 20
-
-        columns: {
-            Math.floor(appWindow.width / 310)
-        }
-
-        anchors.leftMargin: 10
-        anchors.rightMargin: 10
-        anchors.bottomMargin: 50
-        anchors.topMargin: 50
-
-        anchors.fill: parent
-        anchors.bottom: menuLayout.top
-
-        ListModel {
-            id: timerList
-            property var timerValues: ""
-        }
-    }
-
-    Rectangle {
-        id: menuLayout
-        visible: true
-
-        width: 175
-        height: 40
-
-        color: "transparent"
-
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-
-        anchors.bottomMargin: 10
-        anchors.rightMargin: 10
-
-        RoundButton {
-            id: editButton
-            property var oldWidth: 40
-
-            width: 40
-            height: parent.height
-
-            anchors.left: parent.left
-
-            Text {
-                id: textField
-                text: "Edit"
-                color: colors.foreGroundColor
-
-                font.pixelSize: 15
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            background: Rectangle {
-                radius: 5
-
-                color: {
-                    if (parent.down) colors.foreGroundColor
-                    else if (parent.hovered) colors.accentColor
-                    else colors.altAccentColor
-                }
-            }
-
-            onClicked: {
-                appWindow.editButtonToggleSignal()
-
-                if (textField.text == "Edit"){
-                    textField.text = "Done"
-                    newTimerButton.visible = false
-                    anchors.left = undefined
-                    anchors.right = parent.right
-                }
-                else {
-                    textField.text = "Edit"
-                    anchors.left = parent.left
-                    anchors.right = undefined
-                    width = oldWidth
-                    newTimerButton.visible = true
-                }
-            }
-        }
-
-        RoundButton {
-            id: newTimerButton
-
-            width: 125
-            height: parent.height
-
-            anchors.right: parent.right
-
-            Text {
-                text: "Add New Timer"
-                color: colors.foreGroundColor
-
-                font.pixelSize: 15
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            background: Rectangle {
-                radius: 5
-
-                color: {
-                    if (parent.down) {
-                        colors.foreGroundColor
-                    } else if (parent.hovered) {
-                        colors.accentColor
-                    } else {
-                        colors.altAccentColor
-                    }
-                }
-            }
-            onClicked: createNewTimer()
-        }
-    } 
 
     Component.onCompleted: {
         for (let i = 0; i < componentSettings.value("count"); i++)

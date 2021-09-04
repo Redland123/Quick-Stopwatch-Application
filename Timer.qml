@@ -104,8 +104,8 @@ Rectangle {
 
         visible: editButtonStatus
 
-        width: 20
-        height: 20
+        width: 17
+        height: 17
 
         anchors.right: parent.right
         anchors.top: parent.top
@@ -124,7 +124,7 @@ Rectangle {
             color: {
                 if (parent.down) colors.altAccentColor
                 else if (parent.hovered) "Maroon"
-                else "Red"
+                else "#e60000"
             }
         }
     }
