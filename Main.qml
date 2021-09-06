@@ -12,9 +12,9 @@ ApplicationWindow {
     width: 450
     height: 450
 
-    color: "transparent" 
+    //color: "transparent"  
 
-    flags: Qt.FramelessWindowHint
+    //flags: Qt.FramelessWindowHint
 
     Style {id: colors}
     Globals {id: globals}
@@ -31,6 +31,7 @@ ApplicationWindow {
         radius: 2
     }
 
+    /*
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
@@ -63,11 +64,19 @@ ApplicationWindow {
         }
     }
 
+    function toggleMaximized() {
+        if (appWindow.visibility === ApplicationWindow.Maximized) {
+            appWindow.showNormal();
+        } else {
+            appWindow.showMaximized();
+        }
+    }
+    */
 
     Page {
-        header: Loader {source: "Header.qml"}
+        //header: Loader {source: "Header.qml"}
 
-        anchors.margins: appWindow.visibility === Window.Windowed ? 5 : 0
+        //anchors.margins: appWindow.visibility === Window.Windowed ? 5 : 0
         anchors.fill: parent
 
         clip: true
@@ -101,16 +110,6 @@ ApplicationWindow {
         }
 
         footer: Loader {source: "Footer.qml"}
-    }
-
-    
-
-    function toggleMaximized() {
-        if (appWindow.visibility === ApplicationWindow.Maximized) {
-            appWindow.showNormal();
-        } else {
-            appWindow.showMaximized();
-        }
     }
 
     Settings {
