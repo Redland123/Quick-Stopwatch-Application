@@ -1,5 +1,5 @@
-# Quick-Timer-App
-Simple timer/stopwatch app made with QtQuick. Created to keep track of my daily time distrubution.
+# Quick-Timer-Application
+Simple timer/stopwatch program made with QtQuick. Created to keep track of my daily time distrubution.
 
 ## Platform
 Windows
