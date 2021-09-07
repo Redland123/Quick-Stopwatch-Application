@@ -1,5 +1,5 @@
 # Quick-Stopwatch-Application
-Simple stopwatch program made with QtQuick.
+Simple stopwatch application made with QtQuick.
 
 ## Platform
 Windows
