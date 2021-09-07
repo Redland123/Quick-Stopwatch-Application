@@ -15,7 +15,7 @@ Rectangle {
 
     Item {    
         height: 40
-        width: 175
+        width: 200
 
         anchors.rightMargin: 10
         anchors.right: parent.right
@@ -73,13 +73,13 @@ Rectangle {
         RoundButton {
             id: newTimerButton
 
-            width: 125
+            width: 150
             height: parent.height
 
             anchors.right: parent.right
 
             Text {
-                text: "Add New Timer"
+                text: "Add New Stopwatch"
                 color: colors.foreGroundColor
 
                 font.pixelSize: 15

@@ -7,7 +7,7 @@ ApplicationWindow {
     id: appWindow
 
     visible: true
-    title: "Quick Timer"
+    title: "Quick Stopwatch"
 
     width: 450
     height: 450

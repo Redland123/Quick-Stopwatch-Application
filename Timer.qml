@@ -133,7 +133,7 @@ Rectangle {
         id: timerName
 
         font.pixelSize: 20
-        placeholderText: "  Timer Name"
+        placeholderText: "   Name"
         color: colors.foreGroundColor
 
         anchors.topMargin: 5
