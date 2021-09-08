@@ -13,15 +13,13 @@ ApplicationWindow {
     height: 450
 
     //color: "transparent"  
-
     //flags: Qt.FramelessWindowHint
+    //property var bw: 6
 
     Style {id: colors}
-    Globals {id: globals}
 
     signal editButtonToggleSignal()
 
-    property var bw: 6
 
     Rectangle {
         anchors.margins: 4
@@ -114,7 +112,7 @@ ApplicationWindow {
 
     Settings {
         id: windowSettings
-        fileName: "./settings/settings.ini"
+        fileName: "../settings/settings.ini"
 
         category: "MainWindow"
         property alias x: appWindow.x
@@ -125,7 +123,7 @@ ApplicationWindow {
 
     Settings {
         id: componentSettings
-        fileName: "./settings/settings.ini"
+        fileName: "../settings/settings.ini"
 
         category: "Components"
         property alias count: timerList.count

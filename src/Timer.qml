@@ -13,7 +13,6 @@ Rectangle {
     signal beingDeleted()
  
     Style {id: colors}
-    Globals {id: globals}
 
     property var editButtonStatus: false
 
@@ -266,8 +265,8 @@ Rectangle {
                 anchors.margins: 7
 
                 source: {
-                    if (seconds || minutes || hours) "./icons/reset.png"
-                    else "./icons/reset50.png"
+                    if (seconds || minutes || hours) "../icons/reset.png"
+                    else "../icons/reset50.png"
                 }
             }
 
@@ -309,8 +308,8 @@ Rectangle {
                 anchors.margins: 7
 
                 source: {
-                    if (startPauseButton.buttonChecked == true) "./icons/pause.png" 
-                    else "./icons/start.png" 
+                    if (startPauseButton.buttonChecked == true) "../icons/pause.png" 
+                    else "../icons/start.png" 
                 }
             }
 
