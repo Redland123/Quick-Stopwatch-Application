@@ -8,10 +8,9 @@ Rectangle {
     visible: true
 
     height: 50
+    width: 1000
 
     color: "transparent"
-
-    anchors.bottomMargin: 10
 
     Item {    
         height: 40

@@ -16,6 +16,8 @@ Rectangle {
 
     property var editButtonStatus: false
 
+    property var statusBarPrecision: 20
+
     property var seconds: 0
     property var minutes: 0
     property var hours: 0
@@ -68,6 +70,8 @@ Rectangle {
         repeat: true
 
         onTriggered: {
+            timerStatusBar.resetValue()
+
             seconds++
 
             var newDisplayTime = ""
@@ -75,6 +79,9 @@ Rectangle {
             if (Math.floor(seconds / 60)){
                 seconds -= 60
                 minutes++
+
+                //Update times in file
+                updateSettings()
             }
 
             if (Math.floor(minutes / 60)){
@@ -176,6 +183,48 @@ Rectangle {
         color: 'transparent'
         border.color: colors.accentColor
 
+        Rectangle {
+            id: timerStatusBar
+
+            property var statusBarValue: 0
+
+            color: "Dimgrey"
+
+            height: 2
+            width: timerDisplayText.width - 5
+
+            anchors.top: timerDisplayText.bottom 
+            anchors.horizontalCenter: timerDisplayText.horizontalCenter
+
+            Timer {
+                interval: statusBarPrecision
+                running: mainTimer.running
+                repeat: mainTimer.repeat
+
+                onTriggered: {
+                    valueBar.width = (timerStatusBar.width 
+                                    / (1000 / statusBarPrecision)
+                                    * timerStatusBar.statusBarValue)
+                    ++timerStatusBar.statusBarValue
+                }
+            }
+
+            function resetValue(){
+                valueBar.width = 0
+                statusBarValue = 0
+            }
+
+            Rectangle {
+                id: valueBar
+                color: "Darkgrey"
+
+                height: parent.height
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+
         Text {
             id: copyNotification
             visible: false
@@ -272,6 +321,7 @@ Rectangle {
 
             onClicked: {
                 mainTimer.stop()
+                timerStatusBar.resetValue()
 
                 seconds = 0
                 minutes = 0
@@ -326,6 +376,7 @@ Rectangle {
                 if (buttonChecked){
                     buttonChecked = false
                     mainTimer.running = false
+                    timerStatusBar.resetValue()
                 }
                 else {
                     buttonChecked = true
